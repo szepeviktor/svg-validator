@@ -1,4 +1,7 @@
 #!/bin/bash
+#
+# Format an SVG file and write it to formatted/ directory
+#
 
 set -e
 
