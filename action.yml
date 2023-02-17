@@ -1,0 +1,11 @@
+name: "Validate SVG files"
+description: "Validate SVG files against SVG 1.1 schema"
+runs:
+    using: "docker"
+    image: "Dockerfile"
+inputs:
+    svg_path:
+        description: "Glob path of SVG files"
+branding:
+  icon: "book-open"
+  color: "red"
