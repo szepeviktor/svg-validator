@@ -19,25 +19,43 @@ ACTION_FAILED="false"
 Check() {
     local SVG_FILE_PATH="$1"
 
-    test -r "${SVG_FILE_PATH}"
+    if ! test -r "${SVG_FILE_PATH}"; then
+        echo "File not found" 1>&2
+        return 10
+    fi
 
     # First line
-    diff <(sed -n -e '1p' "${SVG_FILE_PATH}") - <<<"${SVG_XML_DECLARATION}"
+    if ! diff <(sed -n -e '1p' "${SVG_FILE_PATH}") - <<<"${SVG_XML_DECLARATION}"; then
+        echo "Missing XML declaration" 1>&2
+        return 11
+    fi
     # Second line
-    diff <(sed -n -e '2p' "${SVG_FILE_PATH}") - <<<"${SVG_DOCTYPE}"
+    if ! diff <(sed -n -e '2p' "${SVG_FILE_PATH}") - <<<"${SVG_DOCTYPE}"; then
+        echo "Missing doctype" 1>&2
+        return 12
+    fi
     # SVG version
-    diff --ignore-space-change <(
+    if ! diff --ignore-space-change <(
         xmlstarlet format --dropdtd "${SVG_FILE_PATH}" \
             | xmlstarlet select -N svg="${SVG_NS_URL}" --template --value-of '/svg:svg/@version'
-        ) - <<<"${SVG_VERSION}"
+        ) - <<<"${SVG_VERSION}"; then
+        echo "Invalid SVG version" 1>&2
+        return 13
+    fi
     # Check formatting without xml:space attribute
-    diff <(
+    if ! diff <(
         xmlstarlet edit -N svg="${SVG_NS_URL}" --delete '//svg:svg/@xml:space' "${SVG_FILE_PATH}" \
             | XMLLINT_INDENT="    " xmllint --format - \
             | xmlstarlet edit --pf -N svg="${SVG_NS_URL}" --append '//svg:svg' --type attr -n 'xml:space' --value 'preserve'
-        ) "${SVG_FILE_PATH}"
+        ) "${SVG_FILE_PATH}"; then
+        echo "Invalid xml:space attribute" 1>&2
+        return 14
+    fi
     # Validation against SVG schema
-    xmllint --noout --schema /usr/local/share/xml/SVG.xsd "${SVG_FILE_PATH}"
+    if ! xmllint --noout --schema /usr/local/share/xml/SVG.xsd "${SVG_FILE_PATH}"; then
+        echo "Schema violation" 1>&2
+        return 15
+    fi
 }
 
 if [ -z "${INPUT_SVG_PATH}" ]; then
@@ -60,7 +78,7 @@ for SVG in ${INPUT_SVG_PATH}; do
 done
 
 if [ "${ACTION_FAILED}" != false ]; then
-    exit 11
+    exit 20
 fi
 
 exit 0
