@@ -1,12 +1,13 @@
 # https://hub.docker.com/_/debian
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 
 LABEL org.opencontainers.image.title="SVG file validator"
 
-ENV LC_ALL="C.UTF-8"
-ENV DEBIAN_FRONTEND="noninteractive"
+ARG LC_ALL="C.UTF-8"
+ARG TERM="linux"
+ARG DEBIAN_FRONTEND="noninteractive"
 
-RUN set -x \
+RUN set -e -x \
     && apt-get update \
     && apt-get install -y wget xmlstarlet libxml2-utils \
     && apt-get autoremove --purge -y \
