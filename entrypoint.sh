@@ -52,7 +52,7 @@ Check() {
         return 14
     fi
     # Validation against SVG schema
-    if ! xmllint --noout --schema /usr/local/share/xml/SVG.xsd "${SVG_FILE_PATH}"; then
+    if ! xmllint --loaddtd --dtdvalid "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" "${SVG_FILE_PATH}"; then
         echo "Schema violation" 1>&2
         return 15
     fi
