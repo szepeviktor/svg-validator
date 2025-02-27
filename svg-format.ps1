@@ -1,11 +1,8 @@
-# Requires xmlstarlet and xmllint in PATH
-# derived from https://github.com/szepeviktor/svg-validator/blob/master/svg-format.sh
-
-# Usage: .\svg-format.ps1 <path-to-svg-file>
-# pre-requisites: xmlstarlet, xmllint
-# For Windows with Chocolatey:
-# choco install xsltproc
-# choco install xmlstarlet
+#
+# Format an SVG file and write it to formatted/ directory.
+#
+# DEPENDS       :choco install xmlstarlet xsltproc
+# USAGE         :.\svg-format.ps1 <path-to-svg-file>
 
 param (
     [Parameter(Mandatory = $true)]
